@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prototipo Plataformas - Phaser</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+    body {
+        margin: 0;
+        background-color: #222;
+        /* Esto centra cualquier cosa que esté adentro (el juego) vertical y horizontalmente */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    canvas {
+        /* Forzamos el tamaño exacto x3 */
+        width: 1152px;
+        height: 648px;
+        /* Como en main.js pusimos pixelArt: true, esto asegura que al estirarlo no se ponga borroso */
+        image-rendering: pixelated; 
+    }
+</style>
+</head>
+<body>
+    <!-- EL TYPE="MODULE" ES OBLIGATORIO PARA USAR IMPORT/EXPORT -->
+    <script type="module" src="main.js"></script>
+</body>
+</html>
