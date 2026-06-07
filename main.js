@@ -15,7 +15,8 @@ const config = {
         },
     },
     render: {
-        pixelArt: true 
+        pixelArt: true,
+        roundPixels: true // <--- AGREGA ESTA LÍNEA
     },
     scene: [Juego],
 };
