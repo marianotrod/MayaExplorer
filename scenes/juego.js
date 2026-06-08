@@ -68,9 +68,9 @@ export default class Juego extends Phaser.Scene {
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1], 
                 [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,0,0,1,1,1,1,1], 
-                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,5,0,0,0,0,0,0,1], 
+                [1,0,0,0,0,0,0,2,5,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,5,0,0,0,0,0,0,1], 
                 [1,1,1,1,1,0,0,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,3,0,5,1,1,1,1,0,0,1],
-                [1,0,0,0,0,0,0,2,5,0,0,2,0,0,0,0,0,0,5,0,0,0,0,0,5,0,2,0,0,0,0,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,2,0,0,0,0,0,0,5,0,0,0,0,0,5,0,2,0,0,0,0,1], 
                 [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,0,0,5,0,0,1,1,1,1,1,1,1,1,1,1,1], 
                 [1,0,0,0,0,0,0,0,5,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1], 
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
@@ -79,11 +79,11 @@ export default class Juego extends Phaser.Scene {
             return [
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1], 
-                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,3,0,1,1,1,1,1], 
+                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,0,0,1,1,1,1,1], 
                 [1,0,0,0,0,0,0,0,5,0,0,2,0,0,0,0,0,0,0,0,0,2,0,0,5,0,0,0,0,0,0,1], 
-                [1,1,1,1,1,3,0,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,0,0,5,1,1,1,1,0,0,1],
+                [1,1,1,1,1,0,0,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,0,0,5,1,1,1,1,0,0,1],
                 [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,5,0,2,0,0,0,0,1], 
-                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,2,0,5,0,0,1,1,1,1,1,1,1,1,1,1,1], 
+                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,0,0,5,1,1,1,1,1,1,1,1,1,1,1,1,1], 
                 [1,0,0,0,0,0,0,0,5,0,0,2,0,0,1,1,1,1,1,0,0,0,2,0,0,0,0,0,0,0,0,1], 
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
             ];
@@ -109,6 +109,16 @@ export default class Juego extends Phaser.Scene {
         this.anims.create({ key: 'murcielago_volar', frames: this.anims.generateFrameNumbers('murcielago', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
         this.anims.create({ key: 'morir', frames: this.anims.generateFrameNumbers('personaje', { start: 18, end: 21 }), frameRate: 10, repeat: -1 });
 
+        // --- AGREGADO: INSTRUCCIONES NIVEL 1 ---
+        if (this.nivelActual === 1) {
+            this.add.text(192, 140, 'FLECHAS PARA MOVERSE\nZ PARA SALTAR', { 
+                fontFamily: '"Press Start 2P"', 
+                fontSize: '8px', 
+                fill: '#ffffff', 
+                align: 'center' 
+            }).setOrigin(0.5).setDepth(101);
+        }
+
         for (let y = 0; y < this.nivelMatriz.length; y++) {
             for (let x = 0; x < this.nivelMatriz[y].length; x++) {
                 let tile = this.nivelMatriz[y][x];
@@ -124,15 +134,20 @@ export default class Juego extends Phaser.Scene {
 
                 if (tile === 1) {
                     let bloque = this.platforms.create(px, py, 'bloque', 1);
-                    
-                    // --- SOLUCIÓN SPIDER-MAN: ELIMINAR COSTURAS INTERNAS ---
-                    // Si el bloque tiene un bloque sólido al lado, apagamos la colisión de esa cara interna
                     if (y > 0 && this.nivelMatriz[y-1][x] === 1) bloque.body.checkCollision.up = false;
                     if (y < this.nivelMatriz.length - 1 && this.nivelMatriz[y+1][x] === 1) bloque.body.checkCollision.down = false;
                     if (x > 0 && this.nivelMatriz[y][x-1] === 1) bloque.body.checkCollision.left = false;
                     if (x < this.nivelMatriz[y].length - 1 && this.nivelMatriz[y][x+1] === 1) bloque.body.checkCollision.right = false;
                 }
-                else if (tile === 5) this.ladders.create(px, py, 'bloque', 5);
+                else if (tile === 5) {
+                    this.ladders.create(px, py, 'bloque', 5);
+                    let pisoEscalera = this.platforms.create(px, py, 'bloque', 5);
+                    pisoEscalera.setVisible(false); 
+                    pisoEscalera.body.checkCollision.down = false;
+                    pisoEscalera.body.checkCollision.left = false;
+                    pisoEscalera.body.checkCollision.right = false;
+                    pisoEscalera.esEscalera = true; 
+                }
                 else if (tile === 6 || tile === 7 || tile === 8) {
                     let joya = this.jewels.create(px, py, 'bloque', tile);
                     joya.tipoJoya = tile; 
@@ -190,7 +205,6 @@ export default class Juego extends Phaser.Scene {
             this.vidasIcons.push(icon);
         }
 
-        // Jugador
         this.player = this.physics.add.sprite(50, 160, 'personaje', 1);
         this.player.setBounce(0.1); 
         this.player.setCollideWorldBounds(true); 
@@ -202,12 +216,13 @@ export default class Juego extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, anchoMundo, 216);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
-        this.anims.create({ key: 'idle', frames: this.anims.generateFrameNumbers('personaje', { start: 0, end: 4 }), frameRate: 8, repeat: -1 });
-        this.anims.create({ key: 'caminar', frames: this.anims.generateFrameNumbers('personaje', { start: 6, end: 10 }), frameRate: 12, repeat: -1 });
-        this.anims.create({ key: 'saltar', frames: [ { key: 'personaje', frame: 6 } ], frameRate: 10 });
-        this.anims.create({ key: 'escalar', frames: this.anims.generateFrameNumbers('personaje', { start: 12, end: 16 }), frameRate: 10, repeat: -1 });
+        this.physics.add.collider(this.player, this.platforms, null, (player, platform) => {
+            if (platform.esEscalera) {
+                if (this.cursors.up.isDown || this.cursors.down.isDown || this.isClimbing) return false;
+            }
+            return true; 
+        }, this);
 
-        this.physics.add.collider(this.player, this.platforms);
         this.physics.add.collider(this.enemies, this.platforms); 
         this.physics.add.overlap(this.player, this.jewels, this.recolectarJoya, null, this);
         this.physics.add.overlap(this.player, this.enemies, this.golpeEnemigo, null, this);
@@ -362,16 +377,12 @@ export default class Juego extends Phaser.Scene {
         });
 
         let tocandoEscalera = false;
-        let debidamenteAdentro = false;
-
-        this.physics.overlap(this.player, this.ladders, (player, ladder) => {
+        this.physics.overlap(this.player, this.ladders, () => {
             tocandoEscalera = true;
-            if (player.body.bottom > (ladder.y - 12 + 6)) debidamenteAdentro = true;
         });
 
         if (tocandoEscalera) {
             if (this.cursors.up.isDown || this.cursors.down.isDown) this.isClimbing = true;
-            else if (this.player.body.velocity.y > 0 && debidamenteAdentro) this.isClimbing = true;
         } else {
             this.isClimbing = false; 
         }
@@ -385,7 +396,6 @@ export default class Juego extends Phaser.Scene {
             this.player.body.setAllowGravity(true);
         }
 
-        // --- MOVIMIENTO LIMPIO (Sin el fix viejo que causaba el tartamudeo) ---
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-160);
             this.player.setFlipX(true); 
@@ -398,7 +408,6 @@ export default class Juego extends Phaser.Scene {
             this.player.setVelocityX(0); 
         }
 
-        // El salto se mantiene fijo con "blocked.down" y JustDown
         if (Phaser.Input.Keyboard.JustDown(this.teclaZ) && (this.player.body.blocked.down || this.isClimbing)) {
             this.player.setVelocityY(-250); 
             this.isClimbing = false; 
