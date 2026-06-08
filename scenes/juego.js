@@ -3,6 +3,12 @@ export default class Juego extends Phaser.Scene {
         super("Juego"); 
     }
 
+    init(data) {
+        this.nivelActual = data.nivel || 1;
+        this.puntaje = data.puntaje || 0;
+        this.vidas = data.vidas !== undefined ? data.vidas : 3;
+    }
+
     preload() {
         this.load.spritesheet('bloque', 'assets/MapTileset.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('personaje', 'assets/ExploradorSpritesheet.png', { frameWidth: 24, frameHeight: 24 });
@@ -15,9 +21,73 @@ export default class Juego extends Phaser.Scene {
         this.load.audio('coin3', 'assets/Coin003.mp3');
         this.load.audio('stun', 'assets/Stun.mp3');
         this.load.audio('fall', 'assets/Fall.mp3');
-        
-        // --- NUEVO: PRELOAD DE VICTORIA ---
         this.load.audio('victory', 'assets/Victory.mp3');
+        this.load.audio('winAll', 'assets/WinAll.mp3');
+        this.load.audio('lose', 'assets/Lose.mp3');
+    }
+
+    obtenerMatrizNivel(nivel) {
+        if (nivel === 1) { 
+            return [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1],
+                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,1],
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,1],
+                [1,1,1,1,1,0,0,0,5,1,1,1,1,0,0,1],
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,1],
+                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,1],
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+        } else if (nivel === 2) { 
+            return [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1],
+                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,1],
+                [1,0,0,0,0,0,0,0,5,0,0,2,0,0,0,1],
+                [1,1,1,1,1,0,0,0,5,1,1,1,1,0,0,1],
+                [1,0,0,0,0,0,0,0,5,0,2,0,0,0,0,1],
+                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,1],
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+        } else if (nivel === 3) { 
+            return [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1], 
+                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,0,0,1,1,1,1,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,5,0,2,0,0,0,0,1], 
+                [1,1,1,1,1,0,3,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,0,0,5,1,1,1,1,0,0,1],
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,3,0,0,0,5,0,2,0,0,0,5,0,0,0,0,0,0,1], 
+                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,0,0,5,0,0,1,1,1,1,1,1,1,1,1,1,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1], 
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+        } else if (nivel === 4) { 
+            return [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1], 
+                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,0,0,1,1,1,1,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,5,0,0,0,0,0,0,1], 
+                [1,1,1,1,1,0,0,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,3,0,5,1,1,1,1,0,0,1],
+                [1,0,0,0,0,0,0,2,5,0,0,2,0,0,0,0,0,0,5,0,0,0,0,0,5,0,2,0,0,0,0,1], 
+                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,0,0,5,0,0,1,1,1,1,1,1,1,1,1,1,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1], 
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+        } else { 
+            return [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1], 
+                [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,3,0,1,1,1,1,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,2,0,0,0,0,0,0,0,0,0,2,0,0,5,0,0,0,0,0,0,1], 
+                [1,1,1,1,1,3,0,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,0,0,5,1,1,1,1,0,0,1],
+                [1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,5,0,2,0,0,0,0,1], 
+                [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,2,0,5,0,0,1,1,1,1,1,1,1,1,1,1,1], 
+                [1,0,0,0,0,0,0,0,5,0,0,2,0,0,1,1,1,1,1,0,0,0,2,0,0,0,0,0,0,0,0,1], 
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+        }
     }
 
     create() {
@@ -25,7 +95,10 @@ export default class Juego extends Phaser.Scene {
         this.musicaFondo = this.sound.add('musica', { loop: true, volume: 0.4 });
         this.musicaFondo.play();
 
-        this.physics.world.setBounds(0, 0, 768, 216);
+        this.nivelMatriz = this.obtenerMatrizNivel(this.nivelActual);
+        let anchoMundo = this.nivelMatriz[0].length * 24;
+        
+        this.physics.world.setBounds(0, 0, anchoMundo, 216);
 
         this.platforms = this.physics.add.staticGroup();
         this.ladders = this.physics.add.staticGroup();
@@ -36,23 +109,9 @@ export default class Juego extends Phaser.Scene {
         this.anims.create({ key: 'murcielago_volar', frames: this.anims.generateFrameNumbers('murcielago', { start: 0, end: 3 }), frameRate: 10, repeat: -1 });
         this.anims.create({ key: 'morir', frames: this.anims.generateFrameNumbers('personaje', { start: 18, end: 21 }), frameRate: 10, repeat: -1 });
 
-        const nivel = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,1], 
-            [1,0,0,1,1,1,1,1,5,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,5,0,0,1,1,1,1,1], 
-            [1,0,0,0,0,0,0,0,5,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,5,0,2,0,0,0,0,1], 
-            [1,1,1,1,1,0,0,0,5,1,1,1,1,1,1,1,1,1,5,1,1,1,0,0,5,1,1,1,1,0,0,1],
-            [1,0,0,0,0,0,0,0,5,0,0,0,0,0,3,0,0,0,5,0,2,0,0,0,5,0,0,0,0,0,0,1], 
-            [1,0,0,0,0,1,1,1,5,1,1,1,0,0,0,0,0,0,5,1,1,1,1,1,1,1,1,1,1,1,1,1], 
-            [1,0,0,0,0,0,0,0,5,0,0,2,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1], 
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
-
-        this.nivelMatriz = nivel;
-
-        for (let y = 0; y < nivel.length; y++) {
-            for (let x = 0; x < nivel[y].length; x++) {
-                let tile = nivel[y][x];
+        for (let y = 0; y < this.nivelMatriz.length; y++) {
+            for (let x = 0; x < this.nivelMatriz[y].length; x++) {
+                let tile = this.nivelMatriz[y][x];
                 let px = x * 24 + 12;
                 let py = y * 24 + 12;
 
@@ -63,7 +122,16 @@ export default class Juego extends Phaser.Scene {
 
                 this.add.image(px, py, 'bloque', 0); 
 
-                if (tile === 1) this.platforms.create(px, py, 'bloque', 1);
+                if (tile === 1) {
+                    let bloque = this.platforms.create(px, py, 'bloque', 1);
+                    
+                    // --- SOLUCIÓN SPIDER-MAN: ELIMINAR COSTURAS INTERNAS ---
+                    // Si el bloque tiene un bloque sólido al lado, apagamos la colisión de esa cara interna
+                    if (y > 0 && this.nivelMatriz[y-1][x] === 1) bloque.body.checkCollision.up = false;
+                    if (y < this.nivelMatriz.length - 1 && this.nivelMatriz[y+1][x] === 1) bloque.body.checkCollision.down = false;
+                    if (x > 0 && this.nivelMatriz[y][x-1] === 1) bloque.body.checkCollision.left = false;
+                    if (x < this.nivelMatriz[y].length - 1 && this.nivelMatriz[y][x+1] === 1) bloque.body.checkCollision.right = false;
+                }
                 else if (tile === 5) this.ladders.create(px, py, 'bloque', 5);
                 else if (tile === 6 || tile === 7 || tile === 8) {
                     let joya = this.jewels.create(px, py, 'bloque', tile);
@@ -101,21 +169,19 @@ export default class Juego extends Phaser.Scene {
             }
         }
 
-        this.puntaje = 0;
         this.combo = 1;
-        this.vidas = 3;
         this.comboTimer = null; 
-        
-        // Estados del jugador
         this.isDead = false;
-        this.isWinning = false; // --- ESTADO DE VICTORIA ---
-        
+        this.isWinning = false; 
+        this.juegoTerminado = false; 
         this.joyasRecolectadas = 0;
 
         // HUD
         this.add.rectangle(0, 0, 384, 24, 0x000000).setOrigin(0, 0).setScrollFactor(0).setDepth(100);
         const estiloTexto = { fontFamily: '"Press Start 2P"', fontSize: '8px', fill: '#ffffff', padding: { top: 4, bottom: 4 }, resolution: 3 };
-        this.puntajeText = this.add.text(12, 4, 'PTS: 0', estiloTexto).setScrollFactor(0).setDepth(101);
+        
+        this.add.text(192, 24, 'NIVEL ' + this.nivelActual, { ...estiloTexto, fill: '#aaaaaa' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(101);
+        this.puntajeText = this.add.text(12, 4, 'PTS: ' + this.puntaje, estiloTexto).setScrollFactor(0).setDepth(101);
         this.comboText = this.add.text(192, 4, 'COMBO: x1', { ...estiloTexto, fill: '#ffd700' }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(101);
         
         this.vidasIcons = [];
@@ -133,7 +199,7 @@ export default class Juego extends Phaser.Scene {
         this.player.setDepth(15);
         this.isClimbing = false;
 
-        this.cameras.main.setBounds(0, 0, 768, 216);
+        this.cameras.main.setBounds(0, 0, anchoMundo, 216);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
 
         this.anims.create({ key: 'idle', frames: this.anims.generateFrameNumbers('personaje', { start: 0, end: 4 }), frameRate: 8, repeat: -1 });
@@ -146,24 +212,23 @@ export default class Juego extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.jewels, this.recolectarJoya, null, this);
         this.physics.add.overlap(this.player, this.enemies, this.golpeEnemigo, null, this);
         
-        // --- LÓGICA DE VICTORIA ---
         this.physics.add.overlap(this.player, this.salida, () => {
-            if (this.puertaAbierta && !this.isWinning) {
+            if (this.puertaAbierta && !this.isWinning && !this.juegoTerminado) {
                 this.isWinning = true; 
-                console.log("¡Nivel Completado!");
-                
-                // 1. Detenemos las físicas del jugador para que no siga cayendo o caminando
                 this.physics.pause();
                 this.player.anims.play('idle', true);
-                
-                // 2. Paramos la música de nivel y ponemos la de victoria
                 this.sound.stopAll();
-                this.sound.play('victory', { volume: 0.8 });
 
-                // 3. Esperamos 4 segundos (4000ms) antes de reiniciar para que se escuche la música
-                this.time.delayedCall(4000, () => {
-                    this.scene.restart(); 
-                });
+                if (this.nivelActual < 5) {
+                    this.sound.play('victory', { volume: 0.8 });
+                    this.time.delayedCall(3000, () => {
+                        this.scene.start('Juego', { nivel: this.nivelActual + 1, puntaje: this.puntaje, vidas: this.vidas });
+                    });
+                } else {
+                    this.juegoTerminado = true;
+                    this.sound.play('winAll', { volume: 0.8 });
+                    this.mostrarPantallaFinal("¡GANASTE EL JUEGO!", "#00ff00");
+                }
             }
         });
 
@@ -172,7 +237,7 @@ export default class Juego extends Phaser.Scene {
     }
 
     recolectarJoya(player, joya) {
-        if (this.isDead || this.isWinning) return; 
+        if (this.isDead || this.isWinning || this.juegoTerminado) return; 
 
         joya.destroy();
         this.puntaje += 50 * this.combo;
@@ -181,18 +246,15 @@ export default class Juego extends Phaser.Scene {
         if (this.joyasRecolectadas >= 5 && !this.puertaAbierta) {
             this.puertaAbierta = true;
             this.salida.setFrame(9); 
-            console.log("¡Puerta Abierta!");
         }
 
         if (joya.tipoJoya === 8) {
             this.combo += 1;
             this.sound.play('coin1', { volume: 0.6 });
-        }
-        else if (joya.tipoJoya === 7) {
+        } else if (joya.tipoJoya === 7) {
             this.combo += 2;
             this.sound.play('coin2', { volume: 0.6 });
-        }
-        else if (joya.tipoJoya === 6) {
+        } else if (joya.tipoJoya === 6) {
             this.combo += 3;
             this.sound.play('coin3', { volume: 0.6 });
         }
@@ -209,12 +271,12 @@ export default class Juego extends Phaser.Scene {
     }
 
     golpeEnemigo(player, enemigo) {
-        if (this.isDead || this.isWinning) return;
+        if (this.isDead || this.isWinning || this.juegoTerminado) return;
         this.isDead = true;
 
         this.sound.play('stun', { volume: 0.8 });
         this.time.delayedCall(300, () => {
-            this.sound.play('fall', { volume: 0.8 });
+            if (this.vidas > 0) this.sound.play('fall', { volume: 0.8 });
         });
 
         this.vidas--;
@@ -240,13 +302,37 @@ export default class Juego extends Phaser.Scene {
             this.combo = 1;
             this.comboText.setText('COMBO: x1');
         } else {
-            console.log("GAME OVER");
-            this.scene.restart();
+            this.juegoTerminado = true;
+            this.physics.pause();
+            this.sound.stopAll();
+            this.sound.play('lose', { volume: 0.8 });
+            this.mostrarPantallaFinal("GAME OVER", "#ff0000");
         }
     }
 
+    mostrarPantallaFinal(titulo, colorTitulo) {
+        let caja = this.add.rectangle(192, 108, 240, 120, 0x000000)
+            .setScrollFactor(0)
+            .setDepth(200);
+        
+        caja.setStrokeStyle(2, 0xffffffff);
+
+        const estiloTitulo = { fontFamily: '"Press Start 2P"', fontSize: '12px', fill: colorTitulo, resolution: 3 };
+        const estiloTexto = { fontFamily: '"Press Start 2P"', fontSize: '8px', fill: '#ffffff', resolution: 3 };
+
+        this.add.text(192, 75, titulo, estiloTitulo).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+        this.add.text(192, 105, 'PTS: ' + this.puntaje, estiloTexto).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+        this.add.text(192, 135, 'Presiona Z para reiniciar', { ...estiloTexto, fill: '#888888' }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+    }
+
     update() {
-        // --- BLOQUEAR CONTROLES Y UPDATE SI ESTÁ MURIENDO O GANANDO ---
+        if (this.juegoTerminado) {
+            if (Phaser.Input.Keyboard.JustDown(this.teclaZ)) {
+                this.scene.start('Juego', { nivel: 1, puntaje: 0, vidas: 3 });
+            }
+            return;
+        }
+
         if (this.isDead) {
             if (this.player.y > 250) this.respawn();
             return; 
@@ -259,7 +345,6 @@ export default class Juego extends Phaser.Scene {
             if (enemigo.tipo === 'vibora') {
                 let velX = enemigo.body.velocity.x;
                 let dirX = Math.sign(velX) || -1; 
-                
                 enemigo.setFlipX(dirX < 0);
                 
                 let pxFrente = enemigo.body.center.x + (dirX * 10);
@@ -300,6 +385,7 @@ export default class Juego extends Phaser.Scene {
             this.player.body.setAllowGravity(true);
         }
 
+        // --- MOVIMIENTO LIMPIO (Sin el fix viejo que causaba el tartamudeo) ---
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-160);
             this.player.setFlipX(true); 
@@ -312,7 +398,8 @@ export default class Juego extends Phaser.Scene {
             this.player.setVelocityX(0); 
         }
 
-        if (this.teclaZ.isDown && (this.player.body.touching.down || this.isClimbing)) {
+        // El salto se mantiene fijo con "blocked.down" y JustDown
+        if (Phaser.Input.Keyboard.JustDown(this.teclaZ) && (this.player.body.blocked.down || this.isClimbing)) {
             this.player.setVelocityY(-250); 
             this.isClimbing = false; 
         }
@@ -324,7 +411,7 @@ export default class Juego extends Phaser.Scene {
         } 
         else {
             this.player.anims.resume();
-            if (!this.player.body.touching.down) this.player.anims.play('saltar', true);
+            if (!this.player.body.blocked.down) this.player.anims.play('saltar', true);
             else if (this.player.body.velocity.x !== 0) this.player.anims.play('caminar', true);
             else this.player.anims.play('idle', true);
         }

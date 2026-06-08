@@ -11,12 +11,12 @@ const config = {
         default: "arcade",
         arcade: {
             gravity: { y: 600 },
-            debug: true,
+            debug: false,
         },
     },
     render: {
         pixelArt: true,
-        roundPixels: true // <--- AGREGA ESTA LÍNEA
+        roundPixels: true 
     },
     scene: [Juego],
 };
